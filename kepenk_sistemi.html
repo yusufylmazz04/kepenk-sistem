@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BYM Otomatik Kepenk Yönetim Sistemi</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 20px; background-color: #eef2f5; color: #333; }
+    .container { max-width: 980px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    h1 { color: #1e293b; text-align: center; margin-bottom: 5px; }
+    .subtitle { text-align: center; color: #64748b; margin-bottom: 20px; font-weight: bold; }
+    
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
+    .nav-tab { padding: 12px 20px; background: #f1f5f9; border: none; border-radius: 8px 8px 0 0; font-weight: bold; cursor: pointer; color: #64748b; font-size: 14px; }
+    .nav-tab.active { background: #2563eb; color: white; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .section { margin-bottom: 30px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: 600; margin-bottom: 5px; color: #475569; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    textarea { resize: vertical; height: 70px; }
+    
+    .row { display: flex; gap: 15px; }
+    .col { flex: 1; }
+    
+    .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+    .checkbox-group input { width: auto; cursor: pointer; }
+    
+    .toggle-content { display: none; margin-top: 15px; padding: 15px; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; }
+
+    button.btn-primary { background-color: #2563eb; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
+    button.btn-primary:hover { background-color: #1d4ed8; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+    th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; }
+    th { background-color: #1e293b; color: white; }
+    tr:nth-child(even) { background-color: #f1f5f9; }
+    
+    .text-success { color: #16a34a; font-weight: bold; }
+    .text-danger { color: #dc2626; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>BYM Otomatik Kepenk</h1>
+  <div class="subtitle">Yönetim Sistemi</div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('servisTab', this)">Servis Kayıtları</button>
+    <button class="nav-tab" onclick="switchTab('kasaTab', this)">Gelir / Gider (Kasa)</button>
+    <button class="nav-tab" onclick="switchTab('alacakTab', this)">Alacak / Borç Takibi</button>
+  </div>
+
+  <!-- SERVİS KAYITLARI SEKME -->
+  <div id="servisTab" class="tab-content active">
+    <div class="section">
+      <h2>Yeni Servis Kaydı</h2>
+      <form id="serviceForm">
+        <div class="row">
+          <div class="col form-group">
+            <label for="customerName">Müşteri Adı / Firma:</label>
+            <input type="text" id="customerName" required placeholder="Örn: Burhan veya ABC Ltd.">
+          </div>
+          <div class="col form-group">
+            <label for="customerPhone">Telefon Numarası:</label>
+            <input type="tel" id="customerPhone" placeholder="05XX XXX XX XX">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="customerAddress">Servis Adresi:</label>
+          <textarea id="customerAddress" placeholder="Açık adres veya mahalle/ilçe bilgisi..."></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col form-group">
+            <label for="serviceDetails">Yapılan İş / Detay:</label>
+            <input type="text" id="serviceDetails" required placeholder="Örn: Kepenk bakımı, Alıcı kart değişimi...">
+          </div>
+          <div class="col form-group">
+            <label for="servicePrice">Ücret (TL):</label>
+            <input type="number" id="servicePrice" required placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col form-group">
+            <label for="warrantyPeriod">Garanti Süresi:</label>
+            <select id="warrantyPeriod">
+              <option value="Garanti Yok">Garanti Yok</option>
+              <option value="1 Yıl">1 Yıl</option>
+              <option value="2 Yıl" selected>2 Yıl</option>
+              <option value="3 Yıl">3 Yıl</option>
+            </select>
+          </div>
+          <div class="col form-group">
+            <label for="serviceStatus">İş Durumu:</label>
+            <select id="serviceStatus">
+              <option value="Beklemede">Beklemede</option>
+              <option value="Tamamlandı" selected>Tamamlandı</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="toggleMotor" onchange="toggleSection('motorDetailsSection', this.checked)">
+          <label for="toggleMotor" style="margin:0; cursor:pointer;">Motor Detayı Ekle (Opsiyonel)</label>
+        </div>
+
+        <div id="motorDetailsSection" class="toggle-content">
+          <div class="row">
+            <div class="col form-group">
+              <label for="motorBrand">Motor Markası:</label>
+              <input type="text" id="motorBrand" placeholder="Örn: Somfy, Mosel...">
+            </div>
+            <div class="col form-group">
+              <label for="motorModel">Model / Tork:</label>
+              <input type="text" id="motorModel" placeholder="Örn: 60 Nm">
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="saveService()" style="margin-top:15px;">Servis Kaydını Kaydet</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h2>Servis Kayıtları Listesi</h2>
+      <input type="text" id="searchBar" placeholder="Müşteri adı veya detay ara..." onkeyup="filterServices()">
+      <table id="serviceTable">
+        <thead>
+          <tr>
+            <th>Tarih</th>
+            <th>Müşteri / Tel</th>
+            <th>Açıklama</th>
+            <th>Garanti</th>
+            <th>Durum</th>
+            <th>Tutar</th>
+          </tr>
+        </thead>
+        <tbody id="serviceList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GELİR / GİDER KASA SEKME -->
+  <div id="kasaTab" class="tab-content">
+    <div class="section">
+      <h2>Yeni Gelir / Gider Ekle</h2>
+      <form id="cashForm">
+        <div class="row">
+          <div class="col form-group">
+            <label for="transType">İşlem Türü:</label>
+            <select id="transType">
+              <option value="Gelir">Gelir (+)</option>
+              <option value="Gider">Gider (-)</option>
+            </select>
+          </div>
+          <div class="col form-group">
+            <label for="byUserSelect">Sorumlu / İsim:</label>
+            <select id="byUserSelect">
+              <option value="BYM">BYM</option>
+              <option value="Burhan">Burhan</option>
+              <option value="Yusuf">Yusuf</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col form-group">
+            <label for="transAmount">Tutar (TL):</label>
+            <input type="number" id="transAmount" required placeholder="0.00">
+          </div>
+          <div class="col form-group">
+            <label for="transCategory">Kategori / Açıklama:</label>
+            <input type="text" id="transCategory" placeholder="Örn: Malzeme alımı, Benzin vs.">
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="saveCashTransaction()">Kasa İşlemini Kaydet</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h2>Kasa Hareketleri</h2>
+      <table id="cashTable">
+        <thead>
+          <tr>
+            <th>Tarih</th>
+            <th>Tür</th>
+            <th>Sorumlu</th>
+            <th>Açıklama</th>
+            <th>Tutar</th>
+          </tr>
+        </thead>
+        <tbody id="cashList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ALACAK / BORÇ TAKİBİ SEKME -->
+  <div id="alacakTab" class="tab-content">
+    <div class="section">
+      <h2>Yeni Alacak / Borç (Verecek) Kaydı</h2>
+      <form id="creditForm">
+        <div class="row">
+          <div class="col form-group">
+            <label for="creditType">Kayıt Türü:</label>
+            <select id="creditType">
+              <option value="Alacak">Alacak (Bizim alacağımız var)</option>
+              <option value="Borç">Borç / Verecek (Bizim borcumuz var)</option>
+            </select>
+          </div>
+          <div class="col form-group">
+            <label for="creditPerson">Kişi / Firma Adı:</label>
+            <input type="text" id="creditPerson" required placeholder="Kimden alınacak / kime verilecek?">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col form-group">
+            <label for="creditAmount">Tutar (TL):</label>
+            <input type="number" id="creditAmount" required placeholder="0.00">
+          </div>
+          <div class="col form-group">
+            <label for="creditDueDate">Vade / Ödeme Tarihi:</label>
+            <input type="date" id="creditDueDate">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="creditNote">Açıklama / Detay:</label>
+          <input type="text" id="creditNote" placeholder="Örn: Kepenk montajı kalan bakiye, malzeme borcu vs.">
+        </div>
+
+        <button type="button" class="btn-primary" onclick="saveCreditRecord()">Alacak / Borç Kaydını Ekle</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h2>Alacak ve Borç Listesi</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Ekleme Tarihi</th>
+            <th>Tür</th>
+            <th>Kişi / Firma</th>
+            <th>Açıklama</th>
+            <th>Vade Tarihi</th>
+            <th>Tutar</th>
+          </tr>
+        </thead>
+        <tbody id="creditList"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(tabId, element) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    element.classList.add('active');
+  }
+
+  function toggleSection(id, show) {
+    document.getElementById(id).style.display = show ? 'block' : 'none';
+  }
+
+  function getTodayDate() {
+    return new Date().toLocaleDateString('tr-TR');
+  }
+
+  function saveService() {
+    const customerName = document.getElementById('customerName').value;
+    const customerPhone = document.getElementById('customerPhone').value;
+    const serviceDetails = document.getElementById('serviceDetails').value;
+    const price = parseFloat(document.getElementById('servicePrice').value) || 0;
+    const warranty = document.getElementById('warrantyPeriod').value;
+    const status = document.getElementById('serviceStatus').value;
+    const motorBrand = document.getElementById('motorBrand').value;
+
+    if (!customerName || !serviceDetails) {
+      alert("Lütfen müşteri adı ve yapılan iş bilgisini girin.");
+      return;
+    }
+
+    const dateStr = getTodayDate();
+    const serviceList = document.getElementById('serviceList');
+    const serviceRow = document.createElement('tr');
+    
+    let descriptionText = serviceDetails;
+    if (motorBrand) descriptionText += " (Motor: " + motorBrand + ")";
+
+    serviceRow.innerHTML = `
+      <td>${dateStr}</td>
+      <td><strong>${customerName}</strong><br>${customerPhone || '-'}</td>
+      <td>${descriptionText}</td>
+      <td>${warranty}</td>
+      <td>${status}</td>
+      <td><strong>${price.toFixed(2)} TL</strong></td>
+    `;
+    serviceList.prepend(serviceRow);
+
+    if (price > 0 && status === "Tamamlandı") {
+      addCashRecord(dateStr, "Gelir", "BYM", `Servis Tahsilatı: ${customerName} - ${serviceDetails}`, price);
+    }
+
+    alert("Servis kaydı başarıyla eklendi!");
+    document.getElementById('serviceForm').reset();
+    if(document.getElementById('motorDetailsSection').style.display === 'block') {
+       toggleSection('motorDetailsSection', false);
+       document.getElementById('toggleMotor').checked = false;
+    }
+  }
+
+  function saveCashTransaction() {
+    const type = document.getElementById('transType').value;
+    const responsable = document.getElementById('byUserSelect').value;
+    const amount = parseFloat(document.getElementById('transAmount').value) || 0;
+    const category = document.getElementById('transCategory').value;
+
+    if (!amount || !category) {
+      alert("Lütfen tutar ve açıklama giriniz.");
+      return;
+    }
+
+    addCashRecord(getTodayDate(), type, responsable, category, amount);
+    alert("Kasa işlemi başarıyla eklendi!");
+    document.getElementById('cashForm').reset();
+  }
+
+  function addCashRecord(date, type, responsable, description, amount) {
+    const cashList = document.getElementById('cashList');
+    const cashRow = document.createElement('tr');
+    const typeClass = type === "Gelir" ? "text-success" : "text-danger";
+    const amountPrefix = type === "Gelir" ? "+" : "-";
+
+    cashRow.innerHTML = `
+      <td>${date}</td>
+      <td class="${typeClass}">${type}</td>
+      <td>${responsable}</td>
+      <td>${description}</td>
+      <td class="${typeClass}">${amountPrefix}${amount.toFixed(2)} TL</td>
+    `;
+    cashList.prepend(cashRow);
+  }
+
+  function saveCreditRecord() {
+    const type = document.getElementById('creditType').value;
+    const person = document.getElementById('creditPerson').value;
+    const amount = parseFloat(document.getElementById('creditAmount').value) || 0;
+    const dueDate = document.getElementById('creditDueDate').value;
+    const note = document.getElementById('creditNote').value;
+
+    if (!person || !amount) {
+      alert("Lütfen kişi/firma adı ve tutar giriniz.");
+      return;
+    }
+
+    const creditList = document.getElementById('creditList');
+    const row = document.createElement('tr');
+    const typeClass = type === "Alacak" ? "text-success" : "text-danger";
+    const formattedDate = dueDate ? new Date(dueDate).toLocaleDateString('tr-TR') : '-';
+
+    row.innerHTML = `
+      <td>${getTodayDate()}</td>
+      <td class="${typeClass}">${type}</td>
+      <td><strong>${person}</strong></td>
+      <td>${note || '-'}</td>
+      <td>${formattedDate}</td>
+      <td class="${typeClass}">${amount.toFixed(2)} TL</td>
+    `;
+    creditList.prepend(row);
+
+    alert("Alacak/Borç kaydı başarıyla eklendi!");
+    document.getElementById('creditForm').reset();
+  }
+
+  function filterServices() {
+    const input = document.getElementById('searchBar').value.toLowerCase();
+    const rows = document.querySelectorAll('#serviceList tr');
+    rows.forEach(row => {
+      row.style.display = row.innerText.toLowerCase().includes(input) ? '' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>
