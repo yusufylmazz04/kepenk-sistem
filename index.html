@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2</script/>
-  const supabaseUrl = 'https://hthqdjajnqieyovmozfs.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0aHFkamFqbnFpZXlvdm1vemZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMDQ3NjYsImV4cCI6MjEwNjY4MDc2Nn0.Kz60J2FUGL7VXyzzBpf42AaxycM2L01U9Xu-yzvBfhw';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-</script>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BYM Otomatik Kepenk Yönetim Sistemi</title>
-    <style>;
+    <style>
         :root {
             --primary-blue: #2563eb;
             --light-bg: #f8fafc;
@@ -707,7 +703,14 @@
     window.onload = renderAll;
 </script>
 
-
+<!-- Supabase Entegrasyonu -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'SUPABASE_URL_BURAYA';
+  const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_BURAYA';
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log('Supabase bağlandı:', supabase);
+</script>
 
 </body>
 </html>
